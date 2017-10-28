@@ -194,6 +194,16 @@ def FreezeAccount(accountNo):
 
     dom = GalileoPOST('modifyStatus', payload)
 
+# Unfreezes account
+def UnfreezeAccount(accountNo):
+    payload = AppendPayload(
+        {
+            'accountNo':accountNo,
+            'type':18
+        })
+
+    dom = GalileoPOST('modifyStatus', payload)
+
 #endregion
 
 #region Money Movement
