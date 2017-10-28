@@ -22,6 +22,7 @@ namespace GalileoAPITesting
             string sEndPoint = "https://sandbox-api.gpsrv.com/intserv/4.0/createAccount";
             string sAPICall = string.Format("{0}?apiLogin={1}&apiTransKey={2}&providerId={3}&transactionId={4}&prodId={5}", sEndPoint, "Dlm5Fn-9999", "QwQTu3mHXK", "488", "90917-random-string-34105", "501");
 
+            string sResponse = HttpGet(sAPICall);
             XmlDocument doc = new XmlDocument();
             doc.LoadXml(sResponse);
             XmlNode xmlAPIResponse = doc.SelectSingleNode("response");
