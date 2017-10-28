@@ -8,38 +8,40 @@ import datetime
 commonPayload = {'apiLogin':'Dlm5Fn-9999','apiTransKey':'QwQTu3mHXK','providerId':'488'}
 
 def main():
-    prn = 999900032825 #(for Ned Stark) CreateAccount({'firstName':'Ned','lastName':'Stark'}) #creating cards?
-    #ActivateAccount(prn)
+    print("Welcome to KidsCard!")
+    prn = CreateAccount({'firstName':input("Enter the first name of the primary card holder: "), 'lastName':input("Enter the last name of the primary card holder: "), 'loadAmount':'100'})#999900032825 #(for Ned Stark) CreateAccount({'firstName':'Ned','lastName':'Stark'}) #creating cards?
+    print("Thanks for joining us! Your account has been credited $100 for being an earlybird")
+    ActivateAccount(prn)
 
     #GetAccountCards(prn)
     #print("Creating child account")
 
-    kidprn1 = 999900032833 #(for Sansa Stark) CreateSecondaryAccount(prn, {'firstName':'Sansa', 'lastName':'Stark'})
-    #ActivateAccount(kidprn1)
-    kidprn2 = 999900032841 #(for Arya Stark) CreateSecondaryAccount(prn, {'firstName':'Arya', 'lastName':'Stark'})
-    #ActivateAccount(kidprn2)
-    kidprn3 = 999900032866 #(for Bran Stark) CreateSecondaryAccount(prn, {'firstName':'Bran', 'lastName':'Stark'})
-    #ActivateAccount(kidprn3)
-    kidprn4 = 999900033864 #(for Jon Snow) CreateSecondaryAccount(prn, {'firstName':'Jon', 'lastName':'Snow'})
+    kidprn1 = CreateSecondaryAccount(prn, {'firstName':input("Enter the name of the first child to add to your account: "), 'lastName':input("Enter the last name of the first child to add to your account: ")})#999900032833 #(for Sansa Stark) CreateSecondaryAccount(prn, {'firstName':'Sansa', 'lastName':'Stark'})
+    ActivateAccount(kidprn1)
+    kidprn2 = CreateSecondaryAccount(prn, {'firstName':input("Enter the name of the second child to add to your account: "), 'lastName':input("Enter the last name of the second child to add to your account: ")})#999900032841 #(for Arya Stark) CreateSecondaryAccount(prn, {'firstName':'Arya', 'lastName':'Stark'})
+    ActivateAccount(kidprn2)
+    CreateAccountTransfer(prn, kidprn1, 30)
 
-    #CreateAdjustment(prn, 100)
-    #CreateAccountTransfer(prn, kidprn3, 30)
+    authId = CreateSimulatedCardAuth(kidprn1, 10, "visa", "Maester's Library")
+    CreateSimulatedCardSettle(kidprn1, authId, "visa")
+
+    print("Please wait as we grab transaction histories...")
+    time.sleep(10)
 
     accounts = {}
     relatedAccounts = GetRelatedAccounts(prn)
-
-    GetTransactionHistory(kidprn4, "2017-01-01", datetime.datetime.now().strftime("%Y-%m-%d"), True)
-    
     accounts = GetChildrenTransactionHistory(relatedAccounts)
 
-    FreezeAccount(kidprn1)
-    print(GetFrozenStatus(kidprn1))
-    UnfreezeAccount(kidprn1)
-    print(GetFrozenStatus(kidprn1))
-#    GetTransactionHistory(kidprn1, 1)
+    print("This is " + GetAccountHolderName(kidprn1) + "'s most recent transactions: \n")
+    for transaction in reversed(accounts[kidprn1]):
+        print(transaction.Date + "    " + transaction.Details + "    $" + transaction.Amount)
+    
 
-    #authId = CreateSimulatedCardAuth(kidprn2, 10, "visa", "Maester's Library", True)
-    #CreateSimulatedCardSettle(kidprn2, authId, "visa", True)
+    #FreezeAccount(kidprn1)
+    #print(GetFrozenStatus(kidprn1))
+    #UnfreezeAccount(kidprn1)
+    #print(GetFrozenStatus(kidprn1))
+
 
     print("\n\n")
     #time.sleep(5)
@@ -208,6 +210,7 @@ def GetChildrenTransactionHistory(relatedAccounts):
 
                 accounts[accountNo].append(TransactionModelObject(amount, details, merchantdesc, date))
 
+    return accounts
 
 #endregion
 

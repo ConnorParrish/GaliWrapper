@@ -189,7 +189,7 @@ def GetChildrenTransactionHistory(relatedAccounts):
         transactionHistory = GetTransactionHistory(accountNo, "2017-01-01", datetime.datetime.now().strftime("%Y-%m-%d"))
         #print(transactionHistory.getElementsByTagName('transactions')[0].firstChild.toprettyxml())
 
-        accounts[accountNo] = []
+        accounts[accountNo] = []+
         transactions = transactionHistory.getElementsByTagName('transactions')
         #print(str(transactions))
 

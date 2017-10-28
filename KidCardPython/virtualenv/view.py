@@ -3,12 +3,14 @@ import sqlite3
 import hashlib
 import testing
 import time
+import datetime
 #import control
 
 def hashpassword(password_to_hash):
 	return hash(password_to_hash)
 
 app = Flask(__name__)
+children_ids = []
 
 ##_________________________
 ## SIGN UP PAGE
@@ -46,12 +48,12 @@ def user_dashboard():
 	firstname = elements[1]
 	lastname = elements[2]
 
-	print(elements)
-
 	children_ids = testing.GetRelatedAccounts(galileo_id)
 
-	#childrenTransactions = {}
-	#childrenTransactions = testing.GetChildrenTransactionHistory(children_ids)
+	if (children_ids.__len__() == 0):
+		 testing.CreateSecondaryAccount(galileo_id, {'firstName':'Tom', 'lastName':'Cruise', 'loadAmount':'12000'})
+		 testing.CreateSecondaryAccount(galileo_id, {'firstName':'Salma', 'lastName':'Hayek', 'loadAmount':'100'})
+		 testing.CreateSecondaryAccount(galileo_id, {'firstName':'Stephen', 'lastName':'King', 'loadAmount':'12'})
 
 	# testing.CreateAccountTransfer(galileo_id, children_ids[0], 100)
 	# testing.CreateAccountTransfer(galileo_id, children_ids[1], 120)
@@ -70,6 +72,10 @@ def user_dashboard():
 
 	return render_template('dashboard.html', firstname = firstname, child1 = childrenNames[children_ids[0]] + " - $" + childrenBalances[children_ids[0]], child2 = childrenNames[children_ids[1]] + " - $" + childrenBalances[children_ids[1]], child3 = childrenNames[children_ids[2]] + " - $" + childrenBalances[children_ids[2]])
 
+
+@app.route('/child1', methods=['POST'])
+def child1():
+	testing.GetTransactionHistory(children_ids[0], "2017-01-01", datetime.datetime.now().strftime("%Y-%m-%d"))
 
 ###_______________
 ### Sign In 
