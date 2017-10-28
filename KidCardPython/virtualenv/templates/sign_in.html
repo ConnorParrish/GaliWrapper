@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<header>
+    
+</header>
+
+<body>
+    <h1 style="text-align:center; color:blue;">
+        Sign-in to your account: 
+    </h1>    
+    
+    <div id="container">
+        <div id="main">
+            <form method="post" action="{{url_for('user_dashboard')}}">
+                
+                <label for="username">Username:</label>
+                <input type="text" name="username"> <br> <br>
+                
+                <label for="password1">Enter Password Again: </label>
+                <input type="password", name="password1"> <br> <br>
+                
+                <input type="submit">
+                
+            </form>
+        </div>
+    </div>
+    
+    
+    
+    
+</body>
+    
+</html>
