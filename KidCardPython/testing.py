@@ -8,19 +8,19 @@ import datetime
 commonPayload = {'apiLogin':'Dlm5Fn-9999','apiTransKey':'QwQTu3mHXK','providerId':'488'}
 
 def main():
-    prn = 999900032825 #(for Ned Stark) CreateAccount() #creating cards?
+    prn = 999900032825 #(for Ned Stark) CreateAccount({'firstName':'Ned','lastName':'Stark'}) #creating cards?
     #ActivateAccount(prn)
 
     #GetAccountCards(prn)
     #print("Creating child account")
 
-    kidprn1 = 999900032833 #(for Sansa Stark) CreateSecondaryAccount(prn)
+    kidprn1 = 999900032833 #(for Sansa Stark) CreateSecondaryAccount(prn, {'firstName':'Sansa', 'lastName':'Stark'})
     #ActivateAccount(kidprn1)
-    kidprn2 = 999900032841 #(for Arya Stark) CreateSecondaryAccount(prn)
+    kidprn2 = 999900032841 #(for Arya Stark) CreateSecondaryAccount(prn, {'firstName':'Arya', 'lastName':'Stark'})
     #ActivateAccount(kidprn2)
-    kidprn3 = 999900032866 #(for Bran Stark) CreateSecondaryAccount(prn)
+    kidprn3 = 999900032866 #(for Bran Stark) CreateSecondaryAccount(prn, {'firstName':'Bran', 'lastName':'Stark'})
     #ActivateAccount(kidprn3)
-    kidprn4 = 999900033864 #(for Jon Snow) CreateSecondaryAccount(prn)
+    kidprn4 = 999900033864 #(for Jon Snow) CreateSecondaryAccount(prn, {'firstName':'Jon', 'lastName':'Snow'})
 
     #CreateAdjustment(prn, 100)
     #CreateAccountTransfer(prn, kidprn3, 30)
@@ -66,7 +66,7 @@ def main():
 #region Account Creation
 
 #Creates parent card
-def CreateAccount(displayXML=False):
+def CreateAccount(additionalUserInformation, displayXML=False):
     payload = AppendPayload(
         {
             'prodId':'5094'
@@ -76,13 +76,13 @@ def CreateAccount(displayXML=False):
     return dom.getElementsByTagName('pmt_ref_no')[0].firstChild.nodeValue
 
 #Creates child cards
-def CreateSecondaryAccount(originPRN, displayXML=False):
+def CreateSecondaryAccount(originPRN, additionalUserInformation, displayXML=False):
     payload = AppendPayload(
         {
             'prodId':'5094',
             'primaryAccount':originPRN,
             'sharedBalance':0
-        }, GatherInput())
+        }, additionalUserInformation)
 
     dom = GalileoPOST('createAccount', payload, displayXML)
     return dom.getElementsByTagName('pmt_ref_no')[0].firstChild.nodeValue
