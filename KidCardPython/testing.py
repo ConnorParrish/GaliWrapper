@@ -20,15 +20,37 @@ def main():
     #ActivateAccount(kidprn2)
     kidprn3 = 999900032866 #(for Bran Stark) CreateSecondaryAccount(prn)
     #ActivateAccount(kidprn3)
+    kidprn4 = 999900033864 #(for Jon Snow) CreateSecondaryAccount(prn)
 
     #CreateAdjustment(prn, 100)
-    #CreateAccountTransfer(prn, kidprn2, 30)
+    #CreateAccountTransfer(prn, kidprn3, 30)
 
+    accounts = {}
     relatedAccounts = GetRelatedAccounts(prn)
+
+    GetTransactionHistory(kidprn4, "2017-01-01", datetime.datetime.now().strftime("%Y-%m-%d"), True)
     
     for accountNo in relatedAccounts:
-        print(GetAccountHolderName(accountNo) + "'s balance: " + GetAccountBalance(accountNo))
-        #print(account)
+        transactionHistory = GetTransactionHistory(accountNo, "2017-01-01", datetime.datetime.now().strftime("%Y-%m-%d"))
+        #print(transactionHistory.getElementsByTagName('transactions')[0].firstChild.toprettyxml())
+
+        accounts[accountNo] = []
+        transactions = transactionHistory.getElementsByTagName('transactions')
+        #print(str(transactions))
+
+        #if transactionHistory.getElementsByTagName('transactions').__len__() != 0:
+        for transaction in transactionHistory.getElementsByTagName('transactions'):
+            if transaction.getElementsByTagName('pmt_ref_no').__len__() != 0:
+                timestamp = transaction.getElementsByTagName('post_ts')[0].firstChild.nodeValue
+                amount = transaction.getElementsByTagName('amt')[0].firstChild.nodeValue
+                details = transaction.getElementsByTagName('details')[0].firstChild.nodeValue
+
+                if (transaction.getElementsByTagName('formatted_merchant_desc')[0].firstChild != None):
+                    merchantdesc = "Transfer from " + transaction.getElementsByTagName('formatted_merchant_desc')[0].firstChild.nodeValue
+                else:
+                    merchantdesc = ""
+
+                accounts[accountNo].append(TransactionModelObject(amount, details, merchantdesc))
 
 #    GetTransactionHistory(kidprn1, 1)
 
@@ -37,7 +59,9 @@ def main():
 
     print("\n\n")
     #time.sleep(5)
-    GetTransactionHistory(kidprn2, '2016-01-01', '2017-12-12', True)
+    #accounts = {kidprn1:{'balance':GetBalance(kidprn1), 'transactions':{'transId':}}}
+
+    GetTransactionHistory(kidprn2, '2016-01-01', '2017-12-12')
 
 #region Account Creation
 
@@ -261,6 +285,12 @@ def randomTransID(length):
     return ''.join(random.choice(numbers) for i in range (length))
 
 #endregion
+
+class TransactionModelObject:
+    def __init__(self, amount, details, merchant_description):
+        self.Amount = amount
+        self.Details = details
+        self.MerchantDescription = merchant_description
 
 
 if __name__ == "__main__":
