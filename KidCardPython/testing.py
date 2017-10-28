@@ -30,28 +30,7 @@ def main():
 
     GetTransactionHistory(kidprn4, "2017-01-01", datetime.datetime.now().strftime("%Y-%m-%d"), True)
     
-    for accountNo in relatedAccounts:
-        transactionHistory = GetTransactionHistory(accountNo, "2017-01-01", datetime.datetime.now().strftime("%Y-%m-%d"))
-        #print(transactionHistory.getElementsByTagName('transactions')[0].firstChild.toprettyxml())
-
-        accounts[accountNo] = []
-        transactions = transactionHistory.getElementsByTagName('transactions')
-        #print(str(transactions))
-
-        #if transactionHistory.getElementsByTagName('transactions').__len__() != 0:
-        for transaction in transactionHistory.getElementsByTagName('transactions'):
-            if transaction.getElementsByTagName('pmt_ref_no').__len__() != 0:
-                timestamp = transaction.getElementsByTagName('post_ts')[0].firstChild.nodeValue
-                amount = transaction.getElementsByTagName('amt')[0].firstChild.nodeValue
-                details = transaction.getElementsByTagName('details')[0].firstChild.nodeValue
-                date = timestamp[:10]
-
-                if (transaction.getElementsByTagName('formatted_merchant_desc')[0].firstChild != None):
-                    merchantdesc = "Transfer from " + transaction.getElementsByTagName('formatted_merchant_desc')[0].firstChild.nodeValue
-                else:
-                    merchantdesc = ""
-
-                accounts[accountNo].append(TransactionModelObject(amount, details, merchantdesc, date))
+    accounts = GetChildrenTransactionHistory(relatedAccounts)
 
     FreezeAccount(kidprn1)
     print(GetFrozenStatus(kidprn1))
@@ -203,6 +182,31 @@ def GetAccountHolderName(accountNo):
     now = datetime.datetime.now().strftime("%Y-%m-%d")
     overview = GetAccountOverview(accountNo, now, now)
     return overview.getElementsByTagName("first_name")[0].firstChild.nodeValue + " " + overview.getElementsByTagName("last_name")[0].firstChild.nodeValue
+
+def GetChildrenTransactionHistory(relatedAccounts):
+    accounts = {}
+    for accountNo in relatedAccounts:
+        transactionHistory = GetTransactionHistory(accountNo, "2017-01-01", datetime.datetime.now().strftime("%Y-%m-%d"))
+        #print(transactionHistory.getElementsByTagName('transactions')[0].firstChild.toprettyxml())
+
+        accounts[accountNo] = []
+        transactions = transactionHistory.getElementsByTagName('transactions')
+        #print(str(transactions))
+
+        #if transactionHistory.getElementsByTagName('transactions').__len__() != 0:
+        for transaction in transactionHistory.getElementsByTagName('transactions'):
+            if transaction.getElementsByTagName('pmt_ref_no').__len__() != 0:
+                timestamp = transaction.getElementsByTagName('post_ts')[0].firstChild.nodeValue
+                amount = transaction.getElementsByTagName('amt')[0].firstChild.nodeValue
+                details = transaction.getElementsByTagName('details')[0].firstChild.nodeValue
+                date = timestamp[:10]
+
+                if (transaction.getElementsByTagName('formatted_merchant_desc')[0].firstChild != None):
+                    merchantdesc = "Transfer from " + transaction.getElementsByTagName('formatted_merchant_desc')[0].firstChild.nodeValue
+                else:
+                    merchantdesc = ""
+
+                accounts[accountNo].append(TransactionModelObject(amount, details, merchantdesc, date))
 
 
 #endregion
