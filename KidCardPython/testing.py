@@ -44,14 +44,19 @@ def main():
                 timestamp = transaction.getElementsByTagName('post_ts')[0].firstChild.nodeValue
                 amount = transaction.getElementsByTagName('amt')[0].firstChild.nodeValue
                 details = transaction.getElementsByTagName('details')[0].firstChild.nodeValue
+                date = timestamp[:10]
 
                 if (transaction.getElementsByTagName('formatted_merchant_desc')[0].firstChild != None):
                     merchantdesc = "Transfer from " + transaction.getElementsByTagName('formatted_merchant_desc')[0].firstChild.nodeValue
                 else:
                     merchantdesc = ""
 
-                accounts[accountNo].append(TransactionModelObject(amount, details, merchantdesc))
+                accounts[accountNo].append(TransactionModelObject(amount, details, merchantdesc, date))
 
+    FreezeAccount(kidprn1)
+    print(GetFrozenStatus(kidprn1))
+    UnfreezeAccount(kidprn1)
+    print(GetFrozenStatus(kidprn1))
 #    GetTransactionHistory(kidprn1, 1)
 
     #authId = CreateSimulatedCardAuth(kidprn2, 10, "visa", "Maester's Library", True)
@@ -113,6 +118,26 @@ def DeactivateAccount(accountNo, displayXML=False):
         })
 
     dom = GalileoPOST('modifyStatus', payload, displayXML)
+
+# Sets a new field with a given value
+def SetUserDefinedAccountField(accountNo, fieldName, fieldValue, displayXML=False):
+    payload = AppendPayload(
+        {
+            'accountNo':accountNo,
+            'fieldId':fieldName,
+            'fieldValue':fieldValue
+        })
+
+    dom = GalileoPOST('setUserDefinedAccountField', payload, displayXML)
+
+# Gets all user defined fields on an account
+def GetUserDefinedAccountFields(accountNo, displayXML=False):
+    payload = AppendPayload(
+        {
+            'accountNo':accountNo
+        })
+
+    return GalileoPOST('getUserDefinedAccountFields', payload, displayXML)
 
 #endregion
 
@@ -185,24 +210,26 @@ def GetAccountHolderName(accountNo):
 #region Account Administration
 
 # Freezes account
-def FreezeAccount(accountNo):
+def FreezeAccount(accountNo, displayXML=False):
     payload = AppendPayload(
         {
             'accountNo':accountNo,
             'type':17
         })
 
-    dom = GalileoPOST('modifyStatus', payload)
+    dom = GalileoPOST('modifyStatus', payload, displayXML)
+    SetUserDefinedAccountField(accountNo, 'Frozen', '1', displayXML)
 
 # Unfreezes account
-def UnfreezeAccount(accountNo):
+def UnfreezeAccount(accountNo, displayXML=False):
     payload = AppendPayload(
         {
             'accountNo':accountNo,
             'type':18
         })
 
-    dom = GalileoPOST('modifyStatus', payload)
+    dom = GalileoPOST('modifyStatus', payload, displayXML)
+    SetUserDefinedAccountField(accountNo, 'Frozen', '0', displayXML)
 
 #endregion
 
@@ -308,14 +335,17 @@ def randomTransID(length):
     letters = string.ascii_lowercase
     return ''.join(random.choice(numbers) for i in range (length))
 
+def GetFrozenStatus(accountNo):
+    return GetUserDefinedAccountFields(accountNo).getElementsByTagName('field_value')[0].firstChild.nodeValue
+
 #endregion
 
 class TransactionModelObject:
-    def __init__(self, amount, details, merchant_description):
+    def __init__(self, amount, details, merchant_description, date):
         self.Amount = amount
         self.Details = details
         self.MerchantDescription = merchant_description
-
+        self.Date = date
 
 if __name__ == "__main__":
     main()
