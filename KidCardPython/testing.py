@@ -182,6 +182,20 @@ def GetAccountHolderName(accountNo):
 
 #endregion
 
+#region Account Administration
+
+# Freezes account
+def FreezeAccount(accountNo):
+    payload = AppendPayload(
+        {
+            'accountNo':accountNo,
+            'type':17
+        })
+
+    dom = GalileoPOST('modifyStatus', payload)
+
+#endregion
+
 #region Money Movement
 #Adjusts balance incase of error (adding money for testing)
 def CreateAdjustment(accountNo, amount, displayXML=False):
