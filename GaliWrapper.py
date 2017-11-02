@@ -293,7 +293,7 @@ def SimulateAndSettleAuth(accountNo, amount, association, merchantName, displayX
 # Generates a post call by given method name and unique payload
 def GalileoPOST(methodName, payload, debugDisplay):
     r = requests.post('https://sandbox-api.gpsrv.com/intserv/4.0/' + methodName, data=payload,
-                      cert="galileo65.pem")
+                      cert="cert/galileo65.pem")
     dom = parseString(r.text)
 
     DebugDisplay(methodName, dom, debugDisplay)
